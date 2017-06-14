@@ -6,7 +6,7 @@ provider "aws" {
 
 # User data script for webserver.
 resource "template_file" "user_data_nginx" {
-  template =  "${file("nginx/user_data.tpl")}"
+  template =  "${file("${path.module}/nginx/user_data.tpl")}"
   vars {
     app_repo = "${var.app_repo}"
     app_playbook = "${var.app_playbook}"
