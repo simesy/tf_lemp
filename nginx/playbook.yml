@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  tasks:
+
+  # @todo Replace AMI with pre-baked or vanilla Ubuntu. Currently uses https://aws.amazon.com/marketplace/pp/B01N0MCONW
+  # Hence references to "jet", also ...
+  # @todo Make this compatible with latest Ansible - current using old syntax because AMI is Debian.
+
+  - name: Point nginx to our repositories webroot.
+    replace:
+      path: /jet/etc/nginx/conf.d/default.vhost
+      regexp: '\/jet\/app\/www\/default'
+      replace: '/var/www/web'
+    sudo: yes
+
+  - name: Restart nginx.
+    command: /jet/bin/nginx -s reload
+
+  - name: Australian AEST time.
+    copy:
+      src: "/usr/share/zoneinfo/Australia/Sydney"
+      dest: /etc/localtime

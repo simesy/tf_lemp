@@ -1,5 +1,5 @@
-output "tflemp_elb_name" {
-  value = "${aws_elb.elb_prod.dns_name}"
+output "tflemp_aws_tag" {
+  value = "${var.identifier}"
 }
 
 output "tflemp_elb_ip" {
