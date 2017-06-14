@@ -31,7 +31,7 @@ Before you begin you will need to:
 ## The AMI
 
 The project currently uses an [Amazon Machine Image](https://aws.amazon.com/marketplace/pp/B01N0MCONW)
-(AMI) that has nginx pre-installed (it all defaults to Sydney). This is a short term solution it will soon
+(AMI) that has nginx pre-installed (available in Sydney region). This is a short term solution it will soon
 be replaced with a default AWS Linux AMI.
 
 In the meantime, feel free to do an experimental `terraform apply`. You'll just need to
@@ -92,4 +92,4 @@ page, you should see:
 
 There will also be 1x [Launch configuration](https://ap-southeast-2.console.aws.amazon.com/ec2/autoscaling/home?region=ap-southeast-2#LaunchConfigurations:) and 1x [Autoscaling group](https://ap-southeast-2.console.aws.amazon.com/ec2/autoscaling/home?region=ap-southeast-2#AutoScalingGroups:view=details).
 
-
+To track all the resources, you can create a [Resource Group](https://resources.console.aws.amazon.com/r/group) - use the Application ID you set in the main.tf as a filter. 
