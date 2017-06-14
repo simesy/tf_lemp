@@ -4,6 +4,11 @@ variable "identifier" {
   default     = "tflemp"
 }
 
+variable "tag" {
+  description = "Used to tag resources."
+  default     = "tflemp_web"
+}
+
 variable "app_repo" {
   description = "A full http path to a repository containing a webroot and a playbook."
   default     = "https://github.com/simesy/tf_lemp"

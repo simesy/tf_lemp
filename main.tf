@@ -18,12 +18,12 @@ resource "template_file" "user_data_nginx" {
 
 # SSH Key for remote access.
 resource "aws_key_pair" "ssh_key" {
-  key_name   = "tf-lemp-deploy"
+  key_name   = "ssh-access"
   public_key = "${var.remote_key}"
 }
 
 resource "aws_elb" "elb_prod" {
-  name = "lil-web-elb"
+  name = "${var.identifier}-web-elb"
 
   # The same availability zone as our instances
   availability_zones = ["${split(",", var.aws_az)}"]
@@ -45,15 +45,15 @@ resource "aws_elb" "elb_prod" {
   }
 
   tags {
-    "Name" = "lil-web-elb"
-    "lilengine_app" = "lilengine_web"
+    "Name" = "${var.identifier}-web-elb"
+    "Application ID" = "${var.tag}"
   }
 
 }
 
 resource "aws_autoscaling_group" "asg_prod" {
   availability_zones   = ["${split(",", var.aws_az)}"]
-  name                 = "lilengine-web-asg"
+  name                 = "${var.identifier}-web-asg"
   max_size             = "${var.asg_max}"
   min_size             = "${var.asg_min}"
   desired_capacity     = "${var.asg_desired}"
@@ -63,22 +63,21 @@ resource "aws_autoscaling_group" "asg_prod" {
 
   tag {
     key                 = "Name"
-    value               = "lil-web-asg"
+    value               = "${var.identifier}-web-asg"
     propagate_at_launch = "true"
   }
 
   tag {
-    key                 = "lilengine_app"
-    value               = "lilengine_web"
+    key                 = "Application ID"
+    value               = "${var.tag}"
     propagate_at_launch = "true"
   }
 }
 
 resource "aws_launch_configuration" "lc_prod" {
-#  name          = "lilengine-web-lc"
   image_id      = "${var.aws_ami}"
   instance_type = "${var.aws_size}"
-  key_name      = "tf-lemp-deploy"
+  key_name      = "ssh-access"
   # Security group
   security_groups = ["${aws_security_group.sg_default.id}"]
   user_data       = "${template_file.user_data_nginx.rendered}"
@@ -87,7 +86,7 @@ resource "aws_launch_configuration" "lc_prod" {
 # Our default security group to access
 # the instances over SSH and HTTP
 resource "aws_security_group" "sg_default" {
-  name        = "lil-web-sg-default"
+  name        = "${var.identifier}-web-sg"
   description = "Http and optionally SSH traffic."
 
   # HTTP access from anywhere.
@@ -108,8 +107,9 @@ resource "aws_security_group" "sg_default" {
   }
 
   tags {
-    "Name" = "lil-web-sg"
-    "lilengine_app" = "lilengine_web"
+  //  "Name" = "${format("%s-web-sg", "${var.identifier}")}"
+    "Name" = "${var.identifier}-web-sg"
+    "Application ID" = "${var.tag}"
   }
 }
 
