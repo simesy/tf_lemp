@@ -1,7 +1,7 @@
-output "tflemp_aws_tag" {
+output "aws_tag" {
   value = "${var.identifier}"
 }
 
-output "tflemp_elb_ip" {
+output "elb_ip" {
   value = "TODO"
 }
