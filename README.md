@@ -46,6 +46,7 @@ while logged into your AWS account.
 4. *AVOID PAYING $$$* - Run `terraform destroy`.
 
 ```
+# main.tf
 module "mymodule" {
     # This repo
     source            = "github.com/simesy/tf_lemp"
@@ -67,6 +68,15 @@ module "mymodule" {
 
     # Whether to allow remote (SSH) access to the nginx servers.
     remote_access     = "true"
+    
+    # Other defaults.
+    # aws_region   = "ap-southeast-2"
+    # aws_az       = "ap-southeast-2a,ap-southeast-2b,ap-southeast-2c"
+    # aws_ami      = "ami-ba231ad9"
+    # asg_min      = "1"
+    # asg_max      = "2"
+    # asg_desired  = "1"
+    # asg_size     = "t1.micro"
 }
 ```
 
