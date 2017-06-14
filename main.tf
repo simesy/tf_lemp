@@ -64,7 +64,7 @@ resource "aws_security_group" "sg_default" {
 
   tags {
     "Name" = "${var.identifier}-web-sg"
-    "Application ID" = "${var.tag}"
+    "Application ID" = "${var.application_id}"
   }
 }
 
@@ -107,7 +107,7 @@ resource "aws_autoscaling_group" "asg_prod" {
 
   tag {
     key                 = "Application ID"
-    value               = "${var.tag}"
+    value               = "${var.application_id}"
     propagate_at_launch = "true"
   }
 }
@@ -138,7 +138,7 @@ resource "aws_elb" "elb_prod" {
 
   tags {
     "Name" = "${var.identifier}-web-elb"
-    "Application ID" = "${var.tag}"
+    "Application ID" = "${var.application_id}"
   }
 
 }
