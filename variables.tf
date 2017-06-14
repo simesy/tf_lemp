@@ -19,6 +19,11 @@ variable "remote_access" {
   default     = "false"
 }
 
+variable "remote_key" {
+  description = "Public key which will be deployed to the nginx servers."
+  default     = "CHANGEME"
+}
+
 variable "aws_region" {
   description = "The AWS region to create things in. Defaults to Sydney."
   default     = "ap-southeast-2"
