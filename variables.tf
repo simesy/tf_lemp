@@ -6,7 +6,7 @@ variable "identifier" {
 
 variable "application_id" {
   description = "Applied as the Application ID for Resource Grouping."
-  default     = "tf_lemp"
+  default     = "tflemp_app"
 }
 
 variable "app_repo" {
