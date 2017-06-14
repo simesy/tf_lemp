@@ -4,9 +4,9 @@ variable "identifier" {
   default     = "tflemp"
 }
 
-variable "tag" {
-  description = "Used to tag resources."
-  default     = "tflemp_web"
+variable "application_id" {
+  description = "Applied as the Application ID for Resource Grouping."
+  default     = "tf_lemp"
 }
 
 variable "app_repo" {
@@ -50,17 +50,17 @@ variable "aws_ami" {
 # Auto scaling group settings.
 
 variable "asg_min" {
-  description = "Min numbers of servers in ASG"
+  description = "Min number of servers in ASG"
   default     = "1"
 }
 
 variable "asg_max" {
-  description = "Max numbers of servers in ASG"
+  description = "Max number of servers in ASG"
   default     = "2"
 }
 
 variable "asg_desired" {
-  description = "Desired numbers of servers in ASG"
+  description = "Desired number of servers in ASG"
   default     = "1"
 }
 
