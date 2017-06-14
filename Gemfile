@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
 
-gem "rspec"
+gem 'awspec', '>= 0.80.0'
+gem 'rake'

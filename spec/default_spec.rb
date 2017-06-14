@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe ec2('lil-web-asg') do
   it { should exist }
   it { should be_running }
