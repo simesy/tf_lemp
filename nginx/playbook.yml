@@ -6,15 +6,18 @@
   # Hence references to "jet", also ...
   # @todo Make this compatible with latest Ansible - current using old syntax because AMI is Debian.
 
-  - name: Point nginx to our repositories webroot.
+  - name: Point nginx to our webroot
     replace:
-      path: /jet/etc/nginx/conf.d/default.vhost
-      regexp: '\/jet\/app\/www\/default'
+      # Should be `path`, but old version ansible on Debian.
+      dest: '/jet/etc/nginx/conf.d/default.vhost'
+      regexp: '/jet/app/www/default'
       replace: '/var/www/web'
-    sudo: yes
+      # Should be `become`, but old version ansible on Debian.
 
-  - name: Restart nginx.
+  - name: Restart nginx
     command: /jet/bin/nginx -s reload
+    sudo: yes
+    sudo_user: admin
 
   - name: Australian AEST time.
     copy:
