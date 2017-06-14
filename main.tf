@@ -78,7 +78,7 @@ resource "aws_launch_configuration" "lc_prod" {
 #  name          = "lilengine-web-lc"
   image_id      = "${var.aws_ami}"
   instance_type = "${var.aws_size}"
-  key_name      = "simesy"
+  key_name      = "tf-lemp-deploy"
   # Security group
   security_groups = ["${aws_security_group.sg_default.id}"]
   user_data       = "${template_file.user_data_nginx.rendered}"
