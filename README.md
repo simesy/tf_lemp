@@ -31,8 +31,8 @@ Before you begin you will need to:
 ## The AMI
 
 The project currently uses an [Amazon Machine Image](https://aws.amazon.com/marketplace/pp/B01N0MCONW)
-(AMI) that has nginx pre-installed (available in Sydney region). This is a short term solution it will soon
-be replaced with a default AWS Linux AMI.
+(AMI) that has nginx pre-installed (available in Sydney region). This is a short term solution *it will soon
+be replaced* with a Ubuntu AMI.
 
 In the meantime, feel free to do an experimental `terraform apply`. You'll just need to
 accept the AMIs service [terms and conditions](https://aws.amazon.com/marketplace/fulfillment?productId=7dc83b25-1a57-418d-acea-06bd8e0855fb&ref_=dtl_psb_continue&region=ap-southeast-2#manual-launch)
