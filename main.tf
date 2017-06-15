@@ -27,7 +27,7 @@ resource "template_file" "user_data_nginx" {
 # SSH Key for remote access to nginx servers.
 # Used in aws_launch_configuration.
 resource "aws_key_pair" "ssh_key" {
-  key_name   = "ssh-access"
+  key_name   = "${var.identifier}-ssh-key"
   public_key = "${var.remote_key}"
 }
 
@@ -35,7 +35,7 @@ resource "aws_key_pair" "ssh_key" {
 resource "aws_launch_configuration" "lc_prod" {
   image_id      = "${var.aws_ami}"
   instance_type = "${var.aws_size}"
-  key_name      = "ssh-access"
+  key_name      = "${var.identifier}-ssh-key"
   # Security group
   security_groups = ["${aws_security_group.sg_default.id}"]
   user_data       = "${template_file.user_data_nginx.rendered}"
@@ -69,7 +69,7 @@ resource "aws_security_group" "sg_default" {
 }
 
 # Attach an SSH access rule  to the security group if remote_access=true
-resource "aws_security_group_rule" "sg_rule_allow_ssh" {
+resource "aws_security_group_rule" "ssh_access" {
   type            = "ingress"
   from_port       = 22
   to_port         = 22

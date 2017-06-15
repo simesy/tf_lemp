@@ -1,7 +1,92 @@
-output "aws_tag" {
+
+
+
+output "identifier" {
   value = "${var.identifier}"
 }
 
-output "elb_ip" {
-  value = "TODO"
+# SECURITY GROUP
+
+output "security_group.id" {
+  value = "${aws_security_group.sg_default.id}"
+}
+
+output "security_group.vpc_id" {
+  value = "${aws_security_group.sg_default.vpc_id}"
+}
+
+output "security_group.owner_id" {
+  value = "${aws_security_group.sg_default.owner_id}"
+}
+
+output "security_group.name" {
+  value = "${aws_security_group.sg_default.name}"
+}
+
+output "security_group.description" {
+  value = "${aws_security_group.sg_default.description}"
+}
+
+output "security_group.ingress" {
+  value = "${aws_security_group.sg_default.ingress}"
+}
+
+output "security_group.egress" {
+  value = "${aws_security_group.sg_default.egress}"
+}
+
+# SECURITY GROUP SSH RULE
+
+output "security_group_rule.id" {
+  value = "${aws_security_group_rule.ssh_access.id}"
+}
+
+output "security_group_rule.type" {
+  value = "${aws_security_group_rule.ssh_access.type}"
+}
+
+output "security_group_rule.from_port" {
+  value = "${aws_security_group_rule.ssh_access.from_port}"
+}
+
+output "security_group_rule.to_port" {
+  value = "${aws_security_group_rule.ssh_access.to_port}"
+}
+
+output "security_group_rule.protocol" {
+  value = "${aws_security_group_rule.ssh_access.protocol}"
+}
+
+# ELB
+
+output "elb.id" {
+  value = "${aws_elb.elb_prod.id}"
+}
+
+output "elb.name" {
+  value = "${aws_elb.elb_prod.name}"
+}
+
+output "elb.dns_name" {
+  value = "${aws_elb.elb_prod.dns_name}"
+}
+
+output "elb.instances" {
+  value = "${aws_elb.elb_prod.instances}"
+}
+
+output "elb.instances.first" {
+  value = "${aws_elb.elb_prod.instances[0]}"
+}
+
+output "elb.instances.count" {
+  value = "${length(aws_elb.elb_prod.instances)}"
+}
+
+output "elb.source_security_group" {
+  value = "${aws_elb.elb_prod.source_security_group}"
+}
+
+output "elb.source_security_group_id" {
+  value = "${aws_elb.elb_prod.source_security_group_id}"
 }
