@@ -1,7 +1,7 @@
 
 variable "identifier" {
   description = "Used to label resources."
-  default     = "tflemp"
+  default     = "blue"
 }
 
 variable "application_id" {

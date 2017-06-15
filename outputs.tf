@@ -1,9 +1,7 @@
-
-
-
 output "identifier" {
   value = "${var.identifier}"
 }
+
 
 # SECURITY GROUP
 
@@ -35,27 +33,12 @@ output "security_group.egress" {
   value = "${aws_security_group.sg_default.egress}"
 }
 
+
 # SECURITY GROUP SSH RULE
 
-output "security_group_rule.id" {
-  value = "${aws_security_group_rule.ssh_access.id}"
-}
+// Bugs are produced trying to produce this when ssh access is off.
+// @see https://github.com/hashicorp/terraform/issues/15300
 
-output "security_group_rule.type" {
-  value = "${aws_security_group_rule.ssh_access.type}"
-}
-
-output "security_group_rule.from_port" {
-  value = "${aws_security_group_rule.ssh_access.from_port}"
-}
-
-output "security_group_rule.to_port" {
-  value = "${aws_security_group_rule.ssh_access.to_port}"
-}
-
-output "security_group_rule.protocol" {
-  value = "${aws_security_group_rule.ssh_access.protocol}"
-}
 
 # ELB
 
