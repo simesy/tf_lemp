@@ -25,21 +25,26 @@ data "template_file" "user_data_nginx" {
 # Used in aws_launch_configuration.
 resource "aws_key_pair" "ssh_key" {
   key_name   = "${var.identifier}-ssh-key"
-  public_key = "${var.remote_key}"
+  public_key = "${var.public_key}"
 }
 
 # AWS Launch configuration for auto scaling group.
-resource "aws_launch_configuration" "lc_prod" {
+resource "aws_launch_configuration" "lc" {
+  # name          = "${var.identifier}-lc"
   image_id      = "${var.aws_ami}"
   instance_type = "${var.aws_size}"
   key_name      = "${var.identifier}-ssh-key"
   # Security group
-  security_groups = ["${aws_security_group.sg_default.id}"]
+  security_groups = ["${aws_security_group.sg.id}"]
   user_data       = "${data.template_file.user_data_nginx.rendered}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # The security group allows HTTP in and everything out.
-resource "aws_security_group" "sg_default" {
+resource "aws_security_group" "sg" {
   name        = "${var.identifier}-web-sg"
   description = "Http and optionally SSH traffic."
 
@@ -65,36 +70,21 @@ resource "aws_security_group" "sg_default" {
   }
 }
 
-# Attach an SSH access rule  to the security group if remote_access=true
-resource "aws_security_group_rule" "ssh_access" {
-  type            = "ingress"
-  from_port       = 22
-  to_port         = 22
-  protocol        = "tcp"
-  cidr_blocks     = ["0.0.0.0/0"]
-
-  security_group_id = "${aws_security_group.sg_default.id}"
-
-  # This logic determines if 0 (disabled) or 1 (enabled) SSH inbound
-  # rules are added to the security group.
-  count = "${var.remote_access == "true" ? 1 : 0}"
-}
-
 
 #
 # Autoscaling Group and Load Balancer.
 #
 
 # AWS Autoscaling group
-resource "aws_autoscaling_group" "asg_prod" {
+resource "aws_autoscaling_group" "asg" {
   availability_zones   = ["${split(",", var.aws_az)}"]
   name                 = "${var.identifier}-web-asg"
   max_size             = "${var.asg_max}"
   min_size             = "${var.asg_min}"
   desired_capacity     = "${var.asg_desired}"
   force_delete         = true
-  launch_configuration = "${aws_launch_configuration.lc_prod.name}"
-  load_balancers       = ["${aws_elb.elb_prod.name}"]
+  launch_configuration = "${aws_launch_configuration.lc.name}"
+  load_balancers       = ["${aws_elb.elb.name}"]
 
   tag {
     key                 = "Name"
@@ -107,16 +97,19 @@ resource "aws_autoscaling_group" "asg_prod" {
     value               = "${var.application_id}"
     propagate_at_launch = "true"
   }
+
+  count = 1
+
 }
 
 
 # AWS Load balancer
-resource "aws_elb" "elb_prod" {
+resource "aws_elb" "elb" {
   name = "${var.identifier}-web-elb"
 
   # The same availability zone as our instances
   availability_zones = ["${split(",", var.aws_az)}"]
-  security_groups      = ["${aws_security_group.sg_default.id}"]
+  security_groups      = ["${aws_security_group.sg.id}"]
 
   listener {
     instance_port     = 80
@@ -137,5 +130,7 @@ resource "aws_elb" "elb_prod" {
     "Name" = "${var.identifier}-web-elb"
     "Application ID" = "${var.application_id}"
   }
+
+  count = 1
 
 }
