@@ -13,14 +13,11 @@ provider "aws" {
 
 # Get the user_data script that will run on each nginx server.
 # Used in aws_launch_configuration.
-resource "template_file" "user_data_nginx" {
+data "template_file" "user_data_nginx" {
   template =  "${file("${path.module}/nginx/user_data.tpl")}"
   vars {
     app_repo = "${var.app_repo}"
     app_playbook = "${var.app_playbook}"
-  }
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -38,7 +35,7 @@ resource "aws_launch_configuration" "lc_prod" {
   key_name      = "${var.identifier}-ssh-key"
   # Security group
   security_groups = ["${aws_security_group.sg_default.id}"]
-  user_data       = "${template_file.user_data_nginx.rendered}"
+  user_data       = "${data.template_file.user_data_nginx.rendered}"
 }
 
 # The security group allows HTTP in and everything out.
