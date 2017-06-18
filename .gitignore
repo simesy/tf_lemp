@@ -1,9 +1,8 @@
-# Compiled files
+# Terraform specific
 *.tfstate
 *.tfstate.backup
-
-# Module directory
 .terraform/
+crash.log
 
 # Other
 .idea

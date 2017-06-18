@@ -48,6 +48,14 @@ resource "aws_security_group" "sg" {
   name        = "${var.identifier}-web-sg"
   description = "Http and optionally SSH traffic."
 
+  # SSH access.
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # HTTP access from anywhere.
   ingress {
     from_port   = 80
@@ -68,8 +76,26 @@ resource "aws_security_group" "sg" {
     "Name" = "${var.identifier}-web-sg"
     "Application ID" = "${var.application_id}"
   }
+
 }
 
+# @todo Temporarily removed below - can be readded when https://github.com/hashicorp/terraform/issues/15300 is fixed?
+
+# Attach an SSH access rule  to the security group if remote_access=true
+#resource "aws_security_group_rule" "ssh_access" {
+#  type            = "ingress"
+#  from_port       = 22
+#  to_port         = 22
+#  protocol        = "tcp"
+#  cidr_blocks     = ["0.0.0.0/0"]
+#
+#  security_group_id = "${aws_security_group.sg.id}"
+#
+  # This logic determines if 0 (disabled) or 1 (enabled) SSH inbound
+  # rules are added to the security group.
+#  count = 1
+#  count = "${var.remote_access == "true" ? 1 : 0}"
+#}
 
 #
 # Autoscaling Group and Load Balancer.
@@ -97,8 +123,6 @@ resource "aws_autoscaling_group" "asg" {
     value               = "${var.application_id}"
     propagate_at_launch = "true"
   }
-
-  count = 1
 
 }
 
@@ -130,7 +154,5 @@ resource "aws_elb" "elb" {
     "Name" = "${var.identifier}-web-elb"
     "Application ID" = "${var.application_id}"
   }
-
-  count = 1
 
 }
