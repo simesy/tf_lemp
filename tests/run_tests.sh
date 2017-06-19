@@ -1,27 +1,19 @@
 #!/usr/bin/env bash
 
-# An identifier to name AWS resources with.
-#IDENT=$1
-
 if [ -f "terraform.tfstate" ]; then
    echo "Aborting tests. Detected existing terraform state, please run 'terraform destroy' and then remove the terraform.* files."
-   #exit
+   exit
 fi
 
-#if [ -z "$IDENT" ]; then
-   # echo "Please pass a string identifier to avoid resource name collisions."
-   # exit
-#fi
+terraform apply -var-file ./tests/spec/test.tfvar
 
-
-PUBLIC_KEY=`cat ./tests/specs/insecure_key.pub`
-
-# terraform plan -var 'identifier='"${IDENT}"
-#terraform apply -var 'remote_key='"${PUBLIC_KEY}"
+echo "Wait 2 minutes to allow an ASG instance to come up."
+sleep 120
+terraform apply -var-file ./tests/spec/test.tfvar
 
 cd tests
 bundle exec rake spec
 cd ..
 
+terraform destroy -force && rm terraform.*
 
-# terraform destroy -force

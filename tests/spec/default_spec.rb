@@ -27,6 +27,7 @@ end
 
 # Test the contents of the web page.
 dns_name = `cd .. && terraform output elb.dns_name`
+print dns_name
 web_output = Net::HTTP.get(URI.parse("http://#{dns_name.strip}"))
 describe "Web output" do
   it "The website should say Hello World" do
@@ -35,8 +36,8 @@ describe "Web output" do
 end
 
 # Test SSH
-instance_ip = `aws ec2 describe-instances --instance-ids i-04d6225a5c1679762 | grep PublicIpAddress | awk -F ":" '{print $2}' | sed 's/[",]//g'`
-ssh_command = "ssh -oStrictHostKeyChecking=no -i ./spec/insecure_key admin@#{instance_ip.strip} exit && echo \$?"
+instance_ip = `aws ec2 describe-instances --instance-ids #{first_instance.strip} | grep PublicIpAddress | awk -F ":" '{print $2}' | sed 's/[",]//g'`
+ssh_command = "ssh -i ./spec/insecure_key -o StrictHostKeyChecking=no admin@#{instance_ip.strip} exit && echo \$?"
 ssh_status = `#{ssh_command}`
 describe "SSH status" do
   it "SSH should return non-error response" do

@@ -64,9 +64,10 @@ module "mymodule" {
     
     # A public key (eg the contents of `cat ~/.ssh/id_rsa.pub`.
     # This will be deployed into the nginx servers.
-    remote_key        = "ssh-rsa ..."
+    public_key        = "ssh-rsa ..."
 
     # Whether to allow remote (SSH) access to the nginx servers.
+    # (Note currently working)
     remote_access     = "true"
     
     # Other defaults.
@@ -93,3 +94,11 @@ page, you should see:
 There will also be 1x [Launch configuration](https://ap-southeast-2.console.aws.amazon.com/ec2/autoscaling/home?region=ap-southeast-2#LaunchConfigurations:) and 1x [Autoscaling group](https://ap-southeast-2.console.aws.amazon.com/ec2/autoscaling/home?region=ap-southeast-2#AutoScalingGroups:view=details).
 
 To track all the resources, you can create a [Resource Group](https://resources.console.aws.amazon.com/r/group) - use the Application ID you set in the main.tf as a filter. 
+
+## Tests
+
+You should install bundler from the ./tests directory (better instructions needed). Then:
+
+```
+   ./tests/run_tests.sh
+```
