@@ -5,7 +5,7 @@
 
 if [ -f "terraform.tfstate" ]; then
    echo "Aborting tests. Detected existing terraform state, please run 'terraform destroy' and then remove the terraform.* files."
-   exit
+   #exit
 fi
 
 #if [ -z "$IDENT" ]; then
@@ -14,17 +14,14 @@ fi
 #fi
 
 
-PUBLIC_KEY=`cat ./tests/insecure_key.pub`
+PUBLIC_KEY=`cat ./tests/specs/insecure_key.pub`
 
 # terraform plan -var 'identifier='"${IDENT}"
-terraform apply -var 'remote_key='"${PUBLIC_KEY}"
+#terraform apply -var 'remote_key='"${PUBLIC_KEY}"
 
 cd tests
 bundle exec rake spec
 cd ..
 
 
-
-
-
-terraform destroy -force
+# terraform destroy -force
