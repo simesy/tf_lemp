@@ -97,8 +97,4 @@ To track all the resources, you can create a [Resource Group](https://resources.
 
 ## Tests
 
-You should install bundler from the ./tests directory (better instructions needed). Then:
-
-```
-   ./tests/run_tests.sh
-```
+See the tests/README.md
