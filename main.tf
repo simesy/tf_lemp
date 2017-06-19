@@ -30,7 +30,7 @@ resource "aws_key_pair" "ssh_key" {
 
 # AWS Launch configuration for auto scaling group.
 resource "aws_launch_configuration" "lc" {
-  # name          = "${var.identifier}-lc"
+  name          = "${var.identifier}-lc"
   image_id      = "${var.aws_ami}"
   instance_type = "${var.aws_size}"
   key_name      = "${var.identifier}-ssh-key"
@@ -100,6 +100,7 @@ resource "aws_security_group" "sg" {
 #
 # Autoscaling Group and Load Balancer.
 #
+
 
 # AWS Autoscaling group
 resource "aws_autoscaling_group" "asg" {

@@ -40,6 +40,17 @@ output "security_group.egress" {
 // @see https://github.com/hashicorp/terraform/issues/15300
 
 
+# LAUNCH CONFIGURATION
+
+output "lc.id" {
+  value = "${aws_launch_configuration.lc.id}"
+}
+
+output "lc.name" {
+  value = "${aws_launch_configuration.lc.name}"
+}
+
+
 # ELB
 
 output "elb.id" {
@@ -73,3 +84,4 @@ output "elb.source_security_group" {
 output "elb.source_security_group_id" {
   value = "${aws_elb.elb.source_security_group_id}"
 }
+
