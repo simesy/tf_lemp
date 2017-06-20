@@ -1,23 +1,24 @@
-# LEMP Server Terraform module
+# Drupal Hosting as a Terraform module
 
-Terraform'd LEMP server, auto-scaling out of the box, with Drupal in mind. It's a work in progress, however
-you can use this to experiment with Terraform and AWS by adding it as a module to a new terraform configuration.
+The goal of this project is to be a drop-in AWS hosting solution for a Drupal site. Does it need to be a Drupal site? No, but that's what it's being built to do, and there are already some architecture decisions around how to manage blue/green deployments. Some of the long term requirements are:
 
-**Warning**: following instructions below might result in being billed by AWS.
+* Load balanced with auto-scaling for nginx/php application instances
+* Aurora or RDS database with optional replication
+* Out-of-box integration with load balancing and performance monitoring to be able to tune for cost/performance
+* Deploying application instances with Ansible (ansible-pull)
+* Consistent tagging of AWS resources for effective cost monitoring
+* Ability to pass through parameters from Terraform to Ansible to control application versioning
+* Efficient database backups to S3
+* A solution for schedule jobs
+* Can spin up parallel/identical environmetn and destroy after use, which allows...
+* CI/Smoke test environments or QA demos.
 
-## What is created
+# Out of scope
 
-* An Elastic Load Balancer
-* An auto-scaling group, which deploys
-* nginx server(s), with optional SSH access
-* Tagged consistently in AWS for billing
-* (todo) Aurora or RDS database
+The idea is to spin up an AWS architecture with enough smarts to then hand-off to an
+Ansible provisioner, which might live in another repository. So the Ansible playbook is parametized combination of a repository url and a playbook path within that repository.
 
-## What is not created
-
-The idea is to spin up the nginx boxes with enough smarts to then hand-off to an
-Ansible provisioner. If you use the default settings, a [simple playbook](https://github.com/simesy/tf_lemp/blob/master/nginx/playbook.yml) will run. Use `app_repo` to point at a different repository, which will
-get cloned to `/var/www`.
+Current we are not using our own pre-baked AMIs, to keep things generic, but if we did the AMI would have nginx and PHP preinstalled. You can pass in a custom AMI of course.
 
 ## Requirements
 
