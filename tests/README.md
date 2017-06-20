@@ -8,12 +8,18 @@ No changes can be merged to master without passing the integration tests. What t
 * Anything to do with health checks and how long it takes to replace sick instances.
 * Database stuff (which is a todo feature anyway)
 
-# Setting up and running tests.
+# Setting up
 
-`cd tests && bundle install && ..`
+1. install AWS CLI - https://aws.amazon.com/cli
 
-`./tests/run_tests.sh`
+2. run `aws configure` for region put `ap-southeast-2`
 
-# Example output
+3. install Bundler - http://bundler.io
 
-<img style='width: 600px' src="example-test-output.png"></img>
+4. run `cd tests && bundle install && cd ..`
+
+# Running tests
+
+run `./tests/run_tests.sh`
+
+<img style='width: 400px' src="example-test-output.png"></img>
