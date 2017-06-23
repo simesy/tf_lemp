@@ -19,7 +19,7 @@ module "vpc_az" {
 
   azs_provisioned       = "3"
   enable_dmz_public_ips = "false"
-  lans_per_az           = "1"
+  lans_per_az           = "0"
   nat_eips_enabled      = "0"
   rt_dmz_id             = "${module.vpc_base.rt_dmz_id}"
   stack_item_fullname   = "${var.application_id}"
@@ -93,7 +93,7 @@ resource "aws_security_group" "sg" {
 
   tags {
     "Name" = "${var.identifier}-web-sg"
-    "Application ID" = "${var.application_id}"
+    "application" = "${var.application_id}"
   }
 
 }
@@ -128,6 +128,9 @@ resource "aws_autoscaling_group" "asg" {
   max_size             = "${var.asg_max}"
   min_size             = "${var.asg_min}"
   desired_capacity     = "${var.asg_desired}"
+//  max_size             = "0"
+//  min_size             = "0"
+//  desired_capacity     = "0"
   force_delete         = true
   launch_configuration = "${aws_launch_configuration.lc.name}"
   load_balancers       = ["${aws_elb.elb.name}"]
@@ -140,7 +143,7 @@ resource "aws_autoscaling_group" "asg" {
   }
 
   tag {
-    key                 = "Application ID"
+    key                 = "application"
     value               = "${var.application_id}"
     propagate_at_launch = "true"
   }
@@ -153,8 +156,9 @@ resource "aws_elb" "elb" {
   name = "${var.identifier}-web-elb"
 
   # The same availability zone as our instances
-  availability_zones = ["${split(",", var.aws_az)}"]
+//  availability_zones = ["${split(",", var.aws_az)}"]
   security_groups      = ["${aws_security_group.sg.id}"]
+  subnets              = ["${module.vpc_az.dmz_ids}"]
 
   listener {
     instance_port     = 80
@@ -173,7 +177,7 @@ resource "aws_elb" "elb" {
 
   tags {
     "Name" = "${var.identifier}-web-elb"
-    "Application ID" = "${var.application_id}"
+    "application" = "${var.application_id}"
   }
 
 }
