@@ -1,15 +1,32 @@
-#
-# Define a Load Balancer and Autoscaling group of nginx servers.
-#
-
 provider "aws" {
   region = "${var.aws_region}"
 }
 
+## Configures base VPC
+module "vpc_base" {
+  source = "github.com/unifio/terraform-aws-vpc?ref=master//base"
 
-#
-# Prepping launch configuration, ssh keys and security groups.
-#
+  enable_dns          = "false"
+  enable_hostnames    = "false"
+  stack_item_fullname = "${var.application_id}"
+  stack_item_label    = "${var.identifier}"
+  vpc_cidr            = "172.16.0.0/21"
+}
+
+## Configures VPC Availabilty Zones
+module "vpc_az" {
+  source = "github.com/unifio/terraform-aws-vpc?ref=master//az"
+
+  azs_provisioned       = "3"
+  enable_dmz_public_ips = "false"
+  lans_per_az           = "1"
+  nat_eips_enabled      = "0"
+  rt_dmz_id             = "${module.vpc_base.rt_dmz_id}"
+  stack_item_fullname   = "${var.application_id}"
+  stack_item_label      = "${var.identifier}"
+  vpc_id                = "${module.vpc_base.vpc_id}"
+}
+
 
 # Get the user_data script that will run on each nginx server.
 # Used in aws_launch_configuration.
@@ -47,6 +64,8 @@ resource "aws_launch_configuration" "lc" {
 resource "aws_security_group" "sg" {
   name        = "${var.identifier}-web-sg"
   description = "Http and optionally SSH traffic."
+
+  vpc_id = "${module.vpc_base.vpc_id}"
 
   # SSH access.
   ingress {
@@ -112,6 +131,7 @@ resource "aws_autoscaling_group" "asg" {
   force_delete         = true
   launch_configuration = "${aws_launch_configuration.lc.name}"
   load_balancers       = ["${aws_elb.elb.name}"]
+  vpc_zone_identifier  = ["${module.vpc_az.dmz_ids}"]
 
   tag {
     key                 = "Name"
@@ -157,3 +177,4 @@ resource "aws_elb" "elb" {
   }
 
 }
+

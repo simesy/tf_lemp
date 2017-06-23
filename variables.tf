@@ -1,6 +1,10 @@
-
 variable "identifier" {
   description = "Used to label resources."
+  default     = "somefin"
+}
+
+variable "bluegreen_id" {
+  description = "Applied when parallel resources are created."
   default     = "blue"
 }
 
@@ -58,6 +62,16 @@ variable "aws_size" {
   default     = "t2.micro"
   description = "AWS instance type"
 }
+
+
+//variable "rds_master_username" {
+//  description = "The ID's of the VPC subnets that the RDS cluster instances will be created in"
+//}
+//
+//variable "rds_master_password" {
+//  description = "The ID's of the VPC subnets that the RDS cluster instances will be created in"
+//}
+//
 
 variable "remote_access" {
   description = "Whether to allow remote (SSH) access to the EC instances in the load balancer."

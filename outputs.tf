@@ -85,3 +85,8 @@ output "elb.source_security_group_id" {
   value = "${aws_elb.elb.source_security_group_id}"
 }
 
+//# Aurora
+//
+//output "rds.address" {
+//    value = "${aws_rds_cluster.rds.address}"
+//}
