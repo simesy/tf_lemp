@@ -2,7 +2,6 @@ provider "aws" {
   region = "${var.aws_region}"
 }
 
-
 # Configures base VPC
 module "vpc_base" {
   source = "github.com/unifio/terraform-aws-vpc?ref=master//base"
@@ -41,11 +40,13 @@ resource "aws_route" "r" {
 # Get the user_data script that will run on each web server instances.
 # Used in aws_launch_configuration.
 data "template_file" "user_data_nginx" {
+  depends_on   = ["aws_db_instance.rds"]
   template =  "${file("${path.module}/webserver/user_data.tpl")}"
   vars {
     app_repo = "${var.app_repo}"
     app_checkout = "${var.app_checkout}"
     app_playbook = "${var.app_playbook}"
+    db_endpoint = "${aws_db_instance.rds.endpoint}"
   }
 }
 
@@ -58,11 +59,10 @@ resource "aws_key_pair" "ssh_key" {
 
 # AWS Launch configuration for auto scaling group.
 resource "aws_launch_configuration" "lc" {
-  name          = "${var.identifier}-lc"
-  image_id      = "${var.aws_ami}"
-  instance_type = "${var.aws_size}"
-  key_name      = "${var.identifier}-ssh-key"
-  # Security group
+  name_prefix     = "${var.identifier}-lc-"
+  image_id        = "${var.aws_ami}"
+  instance_type   = "${var.aws_size}"
+  key_name        = "${var.identifier}-ssh-key"
   security_groups = ["${aws_security_group.sg.id}"]
   user_data       = "${data.template_file.user_data_nginx.rendered}"
 
@@ -90,6 +90,14 @@ resource "aws_security_group" "sg" {
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Database access.
+  ingress {
+    from_port   = 0
+    to_port     = 3306
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -136,12 +144,9 @@ resource "aws_security_group" "sg" {
 resource "aws_autoscaling_group" "asg" {
   availability_zones   = ["${split(",", var.aws_az)}"]
   name                 = "${var.identifier}-web-asg"
-//  max_size             = "${var.asg_max}"
-//  min_size             = "${var.asg_min}"
-//  desired_capacity     = "${var.asg_desired}"
-    max_size             = "0"
-    min_size             = "0"
-    desired_capacity     = "0"
+  max_size             = "${var.asg_max}"
+  min_size             = "${var.asg_min}"
+  desired_capacity     = "${var.asg_desired}"
   force_delete         = true
   launch_configuration = "${aws_launch_configuration.lc.name}"
   load_balancers       = ["${aws_elb.elb.name}"]
@@ -205,6 +210,8 @@ resource "aws_db_instance" "rds" {
   password               = "testingonly"
   vpc_security_group_ids = ["${aws_security_group.sg.id}"]
   db_subnet_group_name   = "${aws_db_subnet_group.db_sng.id}"
+  skip_final_snapshot    = true
+  final_snapshot_identifier = "testing"
 }
 
 resource "aws_db_subnet_group" "db_sng" {

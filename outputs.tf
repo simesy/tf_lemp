@@ -100,3 +100,9 @@ output rt.route_table_id {
 output igw.id {
   value = "${module.vpc_base.igw_id}"
 }
+
+
+# Internet gateway.
+output rds.endpoint {
+  value = "${aws_db_instance.rds.endpoint}"
+}
