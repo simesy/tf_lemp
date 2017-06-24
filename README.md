@@ -61,7 +61,7 @@ module "mymodule" {
     # A repo and (within that repo) an Ansible playbook path.
     # Path to the playbook file in the `app_repo` repository.
     app_repo          = "https://github.com/simesy/tf_lemp"
-    app_playbook      = "nginx/playbook.yml"
+    app_playbook      = "webserver/playbook.yml"
     
     # A public key (eg the contents of `cat ~/.ssh/id_rsa.pub`.
     # This will be deployed into the nginx servers.

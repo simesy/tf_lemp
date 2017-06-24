@@ -20,7 +20,7 @@ variable "app_repo" {
 
 variable "app_playbook" {
   description = "Path to the playbook file in the `app_repo` repository."
-  default     = "nginx/playbook.yml"
+  default     = "webserver/playbook.yml"
 }
 
 variable "aws_region" {
@@ -79,7 +79,7 @@ variable "remote_access" {
 }
 
 variable "public_key" {
-  description = "Public key which will be deployed to the nginx servers. The default public is not usable for security reasons."
+  description = "Public key which will be deployed to the web servers. The default public is not usable for security reasons."
   default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC+ht5bqptAZuZevqSw6VWn/lLLT3nbQY+B11vnY5GouB2IriqgocErWsvAdGkUKhE4MSP53fKcH+WB9lUNQ2gxixtnT8qMr1xJ2pDxE5eaTMLyNxoTzySyH/leEzR34Eh/HIR/hRJqQwUrE5I5BbXje/TAGNPRcYKZC2TtOIKSY5Xsydtxw8Zp+l+VmweZvUYKEanUXxIlZnAOGYfWoHQn1fovJObkvuaG7glo7t3m6qgJqlT78kOnsMMy1RO3TxwDK1QlWjMy1SH4s84+cU1Gy8RHLDZ71F762wvLH3jzEp3OQbgTF3DBRz5nmL9M8+PV5xqmTdqvGXo8bY/RjGWcxa+eyP/p78cI8dMWB7rQxJ1pLuGSw+kg+OH9QOJRM84GkdfASfv6xpu3tXW5yqHd6sSgbaPdtA0BzXNicBjcDo4vOU1/B0cht4hXs82JdK2Nxixd3HKlCZDJ0D4+Nv4PdnQdmxw6A2zHgTjv99yRukk9SmBl4yXt/4p+vfyArcbtqegQbeX/7TGTA5KupqOEgT28Wjmg/dozYooZPSQhFY46e1ZHCZwuPg+XmrWlcgCKf386jTrG61x0Rqw/Jc9PUQ3pa7u7/exk4hG4MirEk6uAzo2Cj/5HRJ7bVIHpV7FBqIbGKggmvRXNp35jMWBjkioW6z4R5QMPUQqsI06IKw== default@example.com"
 }
 

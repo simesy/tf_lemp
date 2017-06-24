@@ -35,17 +35,17 @@ resource "aws_route" "r" {
 }
 
 
-# Get the user_data script that will run on each nginx server.
+# Get the user_data script that will run on each web server instances.
 # Used in aws_launch_configuration.
 data "template_file" "user_data_nginx" {
-  template =  "${file("${path.module}/nginx/user_data.tpl")}"
+  template =  "${file("${path.module}/webserver/user_data.tpl")}"
   vars {
     app_repo = "${var.app_repo}"
     app_playbook = "${var.app_playbook}"
   }
 }
 
-# SSH Key for remote access to nginx servers.
+# SSH Key for remote access to web server instances.
 # Used in aws_launch_configuration.
 resource "aws_key_pair" "ssh_key" {
   key_name   = "${var.identifier}-ssh-key"
@@ -163,7 +163,6 @@ resource "aws_elb" "elb" {
   name = "${var.identifier}-web-elb"
 
   # The same availability zone as our instances
-//  availability_zones = ["${split(",", var.aws_az)}"]
   security_groups      = ["${aws_security_group.sg.id}"]
   subnets              = ["${module.vpc_az.dmz_ids}"]
 
