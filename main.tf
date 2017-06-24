@@ -41,6 +41,7 @@ data "template_file" "user_data_nginx" {
   template =  "${file("${path.module}/webserver/user_data.tpl")}"
   vars {
     app_repo = "${var.app_repo}"
+    app_checkout = "${var.app_checkout}"
     app_playbook = "${var.app_playbook}"
   }
 }

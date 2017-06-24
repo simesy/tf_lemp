@@ -1,4 +1,4 @@
-identifier     = "green"
+identifier     = "froop"
 remote_access  = "true"
 aws_size       = "t2.micro"
 
