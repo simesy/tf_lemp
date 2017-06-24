@@ -13,14 +13,14 @@ variable "application_id" {
   default     = "tflemp_app"
 }
 
-variable "app_checkout" {
-  description = "A branch or tag on the repo."
-  default     = "master"
-}
-
 variable "app_repo" {
   description = "A full http path to a repository containing a webroot and a playbook."
   default     = "https://github.com/simesy/tf_lemp"
+}
+
+variable "app_checkout" {
+  description = "A branch or tag on the repo."
+  default     = "master"
 }
 
 variable "app_playbook" {

@@ -2,6 +2,7 @@ provider "aws" {
   region = "${var.aws_region}"
 }
 
+
 # Configures base VPC
 module "vpc_base" {
   source = "github.com/unifio/terraform-aws-vpc?ref=master//base"
@@ -34,6 +35,8 @@ resource "aws_route" "r" {
   gateway_id = "${module.vpc_base.igw_id}"
 }
 
+
+# ASG and webserver instances.
 
 # Get the user_data script that will run on each web server instances.
 # Used in aws_launch_configuration.
@@ -133,12 +136,12 @@ resource "aws_security_group" "sg" {
 resource "aws_autoscaling_group" "asg" {
   availability_zones   = ["${split(",", var.aws_az)}"]
   name                 = "${var.identifier}-web-asg"
-  max_size             = "${var.asg_max}"
-  min_size             = "${var.asg_min}"
-  desired_capacity     = "${var.asg_desired}"
-//  max_size             = "0"
-//  min_size             = "0"
-//  desired_capacity     = "0"
+//  max_size             = "${var.asg_max}"
+//  min_size             = "${var.asg_min}"
+//  desired_capacity     = "${var.asg_desired}"
+    max_size             = "0"
+    min_size             = "0"
+    desired_capacity     = "0"
   force_delete         = true
   launch_configuration = "${aws_launch_configuration.lc.name}"
   load_balancers       = ["${aws_elb.elb.name}"]
@@ -188,3 +191,24 @@ resource "aws_elb" "elb" {
   }
 }
 
+
+# RDS.
+
+resource "aws_db_instance" "rds" {
+  depends_on             = ["aws_security_group.sg"]
+  identifier             = "${var.identifier}"
+  allocated_storage      = "5"
+  engine                 = "mysql"
+  instance_class         = "db.t2.micro"
+  name                   = "drupal"
+  username               = "drupal"
+  password               = "testingonly"
+  vpc_security_group_ids = ["${aws_security_group.sg.id}"]
+  db_subnet_group_name   = "${aws_db_subnet_group.db_sng.id}"
+}
+
+resource "aws_db_subnet_group" "db_sng" {
+  name        = "main_subnet_group"
+  description = "Our main group of subnets"
+  subnet_ids  = ["${module.vpc_az.dmz_ids}"]
+}
