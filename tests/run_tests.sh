@@ -24,3 +24,4 @@ cd ..
 
 # Clean up.
 terraform destroy -force && rm terraform.*
+
