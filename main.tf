@@ -2,29 +2,36 @@ provider "aws" {
   region = "${var.aws_region}"
 }
 
-## Configures base VPC
+# Configures base VPC
 module "vpc_base" {
   source = "github.com/unifio/terraform-aws-vpc?ref=master//base"
 
-  enable_dns          = "false"
-  enable_hostnames    = "false"
+  enable_dns          = "true"
+  enable_hostnames    = "true"
   stack_item_fullname = "${var.application_id}"
   stack_item_label    = "${var.identifier}"
   vpc_cidr            = "172.16.0.0/21"
 }
 
-## Configures VPC Availabilty Zones
+# Configures VPC Availabilty Zones
 module "vpc_az" {
   source = "github.com/unifio/terraform-aws-vpc?ref=master//az"
 
   azs_provisioned       = "3"
-  enable_dmz_public_ips = "false"
+  enable_dmz_public_ips = "true"
   lans_per_az           = "0"
   nat_eips_enabled      = "0"
   rt_dmz_id             = "${module.vpc_base.rt_dmz_id}"
   stack_item_fullname   = "${var.application_id}"
   stack_item_label      = "${var.identifier}"
   vpc_id                = "${module.vpc_base.vpc_id}"
+}
+
+# Configures route between the created route table and the internet gateway.
+resource "aws_route" "r" {
+  route_table_id               = "${module.vpc_base.rt_dmz_id}"
+  destination_cidr_block  = "0.0.0.0/0"
+  gateway_id = "${module.vpc_base.igw_id}"
 }
 
 
@@ -179,6 +186,5 @@ resource "aws_elb" "elb" {
     "Name" = "${var.identifier}-web-elb"
     "application" = "${var.application_id}"
   }
-
 }
 

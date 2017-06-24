@@ -90,3 +90,13 @@ output "elb.source_security_group_id" {
 //output "rds.address" {
 //    value = "${aws_rds_cluster.rds.address}"
 //}
+
+# Route table.
+output rt.route_table_id {
+  value = "${module.vpc_base.rt_dmz_id}"
+}
+
+# Internet gateway.
+output igw.id {
+  value = "${module.vpc_base.igw_id}"
+}
