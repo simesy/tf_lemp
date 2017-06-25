@@ -2,6 +2,10 @@ output "identifier" {
   value = "${var.identifier}"
 }
 
+output user_data_nginx {
+  value = "${data.template_file.user_data_nginx.rendered}"
+}
+
 
 # SECURITY GROUP
 
@@ -91,10 +95,19 @@ output "elb.source_security_group_id" {
 //    value = "${aws_rds_cluster.rds.address}"
 //}
 
+
+# VPC
+
+output vpc.id {
+  value = "${module.vpc_base.vpc_id}"
+}
+
+
 # Route table.
 output rt.route_table_id {
   value = "${module.vpc_base.rt_dmz_id}"
 }
+
 
 # Internet gateway.
 output igw.id {
@@ -102,7 +115,22 @@ output igw.id {
 }
 
 
-# Internet gateway.
+# RDS
+
 output rds.endpoint {
   value = "${aws_db_instance.rds.endpoint}"
+}
+
+output rds.id {
+  value = "${aws_db_instance.rds.id}"
+}
+
+output rds.name {
+  value = "${aws_db_instance.rds.name}"
+}
+
+
+# Database subnet group.
+output db_sng.id {
+  value = "${aws_db_subnet_group.db_sng.id}"
 }

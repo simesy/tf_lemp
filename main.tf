@@ -47,6 +47,7 @@ data "template_file" "user_data_nginx" {
     app_checkout = "${var.app_checkout}"
     app_playbook = "${var.app_playbook}"
     db_endpoint = "${aws_db_instance.rds.endpoint}"
+    db_pass = "${var.db_pass}"
   }
 }
 
@@ -201,7 +202,7 @@ resource "aws_elb" "elb" {
 
 resource "aws_db_instance" "rds" {
   depends_on             = ["aws_security_group.sg"]
-  identifier             = "${var.identifier}"
+  identifier             = "${var.identifier}-rds"
   allocated_storage      = "5"
   engine                 = "mysql"
   instance_class         = "db.t2.micro"
@@ -216,6 +217,5 @@ resource "aws_db_instance" "rds" {
 
 resource "aws_db_subnet_group" "db_sng" {
   name        = "main_subnet_group"
-  description = "Our main group of subnets"
   subnet_ids  = ["${module.vpc_az.dmz_ids}"]
 }

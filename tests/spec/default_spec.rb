@@ -3,10 +3,15 @@ require 'net/http'
 require 'uri'
 
 # These variables match test.tfvar. Couldn't load them directly without Go/Ruby inconsistency.
-identifier     = "green"
+identifier     = "aurora"
 remote_access  = "true"
 aws_size       = "t2.micro"
 public_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDMJssVcx80Qjb500UxUbfkWFG6GV6n1t2zHEXoszFDjdNGSnU+bgAYby6nNMgr4prPsP8OGnvm9aox5SKruijp69+IyD0dcMbZZZEQ07aQU1pY9/iuMTfbAElrN620KEPFUfXJoNbsEbiGZCYzHifPnZsiYhexqcO8tkODIPRdPcZeqKnFGs1D3T2kuu+6edm0DqEBsQ7wSjG1XSGRRN0u/3x4/fV7rB9NQcuAIoy9rV5CUAFjeG0TZ/Pe1U7kjikrwE8UtBL8e28YOvRaIYrpQYCiak7ZRsZYaXs7Q76nxg6e0u7X3a6Hxj6BLd548h0MA+EXMahNz+ISVCoro/n1Wgbb87xy9XnpZjMvuoOGvq6ClZ9EiznNEbCRijphoZ/HCyTTxGny9wiWc0XxrqanwL2Sg7RQUReDaY6J9rPmMTR6AUh5IWggmtm15mYTHcgY7aEVYPnkTCMEJ8u8umCSg9No+LkjzjjD9Gfg8f9taCZivNFWYDm4QG756jBVybdBgMa91ROmWZxdQA3V8iyGD4SowHXa22pMp95JFFE/GVb/wPjbS1z+huek4frl13CFKpJI668F6ZxZZEOEQ/mk7j9QNzI4Lo09HTE40vtPIDTTuJ9qXYnGJx2ZHAr3RUDzscJ/nQsdaXii4FGQRnCIw2tNP/vbUqRrIfEixJUcPQ== insecure@example.com"
+
+
+first_instance = `cd .. && terraform output elb.instances.first`
+vpc_id = `cd .. && terraform output vpc.id`
+db_sng_id = `cd .. && terraform output db_sng.id`
 
 # Test the ASG
 describe autoscaling_group("#{identifier}-web-asg") do
@@ -18,12 +23,22 @@ describe autoscaling_group("#{identifier}-web-asg") do
 end
 
 # Test one of the instances in the ASG.
-first_instance = `cd .. && terraform output elb.instances.first`
 describe ec2("#{first_instance.strip}") do
   it { should exist }
   it { should be_running }
   its(:instance_type) { should eq "#{aws_size}"}
   it { should have_security_group("#{identifier}-web-sg") }
+end
+
+# Database.
+describe rds("#{identifier}-rds") do
+  it { should exist }
+  it { should be_available }
+  it { should_not be_maintenance }
+  its(:db_instance_class) { should eq 'db.t2.micro' }
+  it { should have_security_group("#{identifier}-web-sg") }
+  it { should belong_to_vpc("#{vpc_id.strip}") }
+  it { should belong_to_db_subnet_group("#{db_sng_id.strip}") }
 end
 
 # Test the contents of the web page.
