@@ -3,13 +3,14 @@ require 'net/http'
 require 'uri'
 
 # These variables match test.tfvar. Couldn't load them directly without Go/Ruby inconsistency.
-identifier     = "bling"
+identifier     = "green"
 remote_access  = "true"
 aws_size       = "t2.micro"
 
 first_instance = `cd .. && terraform output elb.instances.first`
 vpc_id = `cd .. && terraform output vpc.id`
 db_sng_id = `cd .. && terraform output db_sng.id`
+dns_name = `cd .. && terraform output elb.dns_name`
 
 # Test the ASG
 describe autoscaling_group("#{identifier}-web-asg") do
@@ -39,13 +40,19 @@ describe rds("#{identifier}-rds") do
   it { should belong_to_db_subnet_group("#{db_sng_id.strip}") }
 end
 
-# Test the contents of the web page.
-dns_name = `cd .. && terraform output elb.dns_name`
-print dns_name
+# Test the contents of the static web page.
 web_output = Net::HTTP.get(URI.parse("http://#{dns_name.strip}"))
-describe "Web output" do
+describe "Static web test" do
   it "The website should say Hello World" do
     expect(web_output).to eq("Hello World")
+  end
+end
+
+# Test the database connection.
+web_output_db = Net::HTTP.get(URI.parse("http://#{dns_name.strip}/db-test.php"))
+describe "DB connection test" do
+  it "The website should say Hello World" do
+    expect(web_output_db).to eq("Hello World")
   end
 end
 

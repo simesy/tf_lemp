@@ -2,7 +2,7 @@
 
 if [ -f "terraform.tfstate" ]; then
    echo "Aborting tests. Detected existing terraform state, please run 'terraform destroy' and then remove the terraform.* files."
-   exit
+  # exit
 fi
 
 CHECKOUT=$(git symbolic-ref --short -q HEAD)
