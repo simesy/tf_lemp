@@ -10,4 +10,4 @@ sudo bash -c 'echo localhost > /etc/ansible/hosts'
 sudo ansible-pull --url=${ app_repo } \
   --checkout=${ app_checkout } \
   --directory=/var/app ${ app_playbook } \
-  --extra-vars "db_endpoint=${ db_endpoint } db_pass=${ db_pass }"
+  --extra-vars "db_address=${ db_address } db_pass=${ db_pass }"

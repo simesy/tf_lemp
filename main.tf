@@ -46,7 +46,7 @@ data "template_file" "user_data_nginx" {
     app_repo = "${var.app_repo}"
     app_checkout = "${var.app_checkout}"
     app_playbook = "${var.app_playbook}"
-    db_endpoint = "${aws_db_instance.rds.endpoint}"
+    db_address= "${aws_db_instance.rds.address}"
     db_pass = "${var.db_pass}"
   }
 }

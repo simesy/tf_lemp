@@ -19,7 +19,15 @@
     sudo: yes
     sudo_user: admin
 
-  - name: Australian AEST time.
+  - name: Populate the database
+    command: >
+      mysql --user=drupal --password={ db_pass } --host={ db_address } < /var/app/tests/webserver/test-data.sql
+
+  - name: Connection settings file
+    command: >
+      echo "<?php $db_host = '{ db_address }'; $db_pass = '{ db_pass }'" > /var/app/tests/webserver/db-credentials.php
+
+  - name: Australian AEST time
     copy:
       src: "/usr/share/zoneinfo/Australia/Sydney"
       dest: /etc/localtime

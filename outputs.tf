@@ -79,7 +79,7 @@ output "elb.instances.first" {
 
 # Output something like this, or script it.
 # Get the public addess with AWS CLI.
-# aws ec2 describe-instances --instance-ids i-0db00244bed7c7b6f --query 'Reservations[].Instances[].PublicDnsName' --output text
+# aws ec2 describe-instances --instance-ids INSTANCE --query 'Reservations[].Instances[].PublicDnsName' --output text
 # ssh -i ./tests/spec/insecure_key admin@OUTPUT-OF-ABOVE
 
 output "elb.instances.count" {
@@ -118,6 +118,10 @@ output igw.id {
 
 output rds.endpoint {
   value = "${aws_db_instance.rds.endpoint}"
+}
+
+output rds.address {
+  value = "${aws_db_instance.rds.address}"
 }
 
 output rds.id {
