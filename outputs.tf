@@ -77,6 +77,11 @@ output "elb.instances.first" {
   value = "${aws_elb.elb.instances[0]}"
 }
 
+# Output something like this, or script it.
+# Get the public addess with AWS CLI.
+# aws ec2 describe-instances --instance-ids i-0db00244bed7c7b6f --query 'Reservations[].Instances[].PublicDnsName' --output text
+# ssh -i ./tests/spec/insecure_key admin@OUTPUT-OF-ABOVE
+
 output "elb.instances.count" {
   value = "${length(aws_elb.elb.instances)}"
 }
@@ -88,12 +93,6 @@ output "elb.source_security_group" {
 output "elb.source_security_group_id" {
   value = "${aws_elb.elb.source_security_group_id}"
 }
-
-//# Aurora
-//
-//output "rds.address" {
-//    value = "${aws_rds_cluster.rds.address}"
-//}
 
 
 # VPC
@@ -131,6 +130,7 @@ output rds.name {
 
 
 # Database subnet group.
+
 output db_sng.id {
   value = "${aws_db_subnet_group.db_sng.id}"
 }
