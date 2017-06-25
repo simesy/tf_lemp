@@ -11,7 +11,7 @@
       # Should be `path`, but old version ansible on Debian.
       dest: '/jet/etc/nginx/conf.d/default.vhost'
       regexp: '/jet/app/www/default'
-      replace: '/var/app/webserver/www'
+      replace: '/var/app/tests/webserver/www'
       # Should be `become`, but old version ansible on Debian.
 
   - name: Restart nginx

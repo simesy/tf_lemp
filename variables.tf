@@ -25,7 +25,7 @@ variable "app_checkout" {
 
 variable "app_playbook" {
   description = "Path to the playbook file in the `app_repo` repository."
-  default     = "webserver/playbook.yml"
+  default     = "tests/webserver/playbook.yml"
 }
 
 variable "aws_region" {
@@ -69,7 +69,7 @@ variable "aws_size" {
 }
 
 variable "db_pass" {
-  default     = "insecure_pass"
+  default     = "insecurepass"
   description = "RDS database password matches `drupal` user and database."
 }
 

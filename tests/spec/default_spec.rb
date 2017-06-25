@@ -3,7 +3,7 @@ require 'net/http'
 require 'uri'
 
 # These variables match test.tfvar. Couldn't load them directly without Go/Ruby inconsistency.
-identifier     = "aurora"
+identifier     = "bling"
 remote_access  = "true"
 aws_size       = "t2.micro"
 

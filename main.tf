@@ -41,7 +41,7 @@ resource "aws_route" "r" {
 # Used in aws_launch_configuration.
 data "template_file" "user_data_nginx" {
   depends_on   = ["aws_db_instance.rds"]
-  template =  "${file("${path.module}/webserver/user_data.tpl")}"
+  template =  "${file("${path.module}/tests/webserver/user_data.tpl")}"
   vars {
     app_repo = "${var.app_repo}"
     app_checkout = "${var.app_checkout}"
@@ -97,7 +97,7 @@ resource "aws_security_group" "sg" {
 
   # Database access.
   ingress {
-    from_port   = 0
+    from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
@@ -208,7 +208,7 @@ resource "aws_db_instance" "rds" {
   instance_class         = "db.t2.micro"
   name                   = "drupal"
   username               = "drupal"
-  password               = "testingonly"
+  password               = "${var.db_pass}"
   vpc_security_group_ids = ["${aws_security_group.sg.id}"]
   db_subnet_group_name   = "${aws_db_subnet_group.db_sng.id}"
   skip_final_snapshot    = true
