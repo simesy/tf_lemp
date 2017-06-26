@@ -1,27 +1,57 @@
-#
-# Define a Load Balancer and Autoscaling group of nginx servers.
-#
-
 provider "aws" {
   region = "${var.aws_region}"
 }
 
+# Configures base VPC
+module "vpc_base" {
+  source = "github.com/unifio/terraform-aws-vpc?ref=master//base"
 
-#
-# Prepping launch configuration, ssh keys and security groups.
-#
+  enable_dns          = "true"
+  enable_hostnames    = "true"
+  stack_item_fullname = "${var.application_id}"
+  stack_item_label    = "${var.identifier}"
+  vpc_cidr            = "172.16.0.0/21"
+}
 
-# Get the user_data script that will run on each nginx server.
+# Configures VPC Availabilty Zones
+module "vpc_az" {
+  source = "github.com/unifio/terraform-aws-vpc?ref=master//az"
+
+  azs_provisioned       = "3"
+  enable_dmz_public_ips = "true"
+  lans_per_az           = "0"
+  nat_eips_enabled      = "0"
+  rt_dmz_id             = "${module.vpc_base.rt_dmz_id}"
+  stack_item_fullname   = "${var.application_id}"
+  stack_item_label      = "${var.identifier}"
+  vpc_id                = "${module.vpc_base.vpc_id}"
+}
+
+# Configures route between the created route table and the internet gateway.
+resource "aws_route" "r" {
+  route_table_id               = "${module.vpc_base.rt_dmz_id}"
+  destination_cidr_block  = "0.0.0.0/0"
+  gateway_id = "${module.vpc_base.igw_id}"
+}
+
+
+# ASG and webserver instances.
+
+# Get the user_data script that will run on each web server instances.
 # Used in aws_launch_configuration.
 data "template_file" "user_data_nginx" {
-  template =  "${file("${path.module}/nginx/user_data.tpl")}"
+  depends_on   = ["aws_db_instance.rds"]
+  template =  "${file("${path.module}/tests/webserver/user_data.tpl")}"
   vars {
     app_repo = "${var.app_repo}"
+    app_checkout = "${var.app_checkout}"
     app_playbook = "${var.app_playbook}"
+    db_address= "${aws_db_instance.rds.address}"
+    db_pass = "${var.db_pass}"
   }
 }
 
-# SSH Key for remote access to nginx servers.
+# SSH Key for remote access to web server instances.
 # Used in aws_launch_configuration.
 resource "aws_key_pair" "ssh_key" {
   key_name   = "${var.identifier}-ssh-key"
@@ -30,11 +60,10 @@ resource "aws_key_pair" "ssh_key" {
 
 # AWS Launch configuration for auto scaling group.
 resource "aws_launch_configuration" "lc" {
-  name          = "${var.identifier}-lc"
-  image_id      = "${var.aws_ami}"
-  instance_type = "${var.aws_size}"
-  key_name      = "${var.identifier}-ssh-key"
-  # Security group
+  name_prefix     = "${var.identifier}-lc-"
+  image_id        = "${var.aws_ami}"
+  instance_type   = "${var.aws_size}"
+  key_name        = "${var.identifier}-ssh-key"
   security_groups = ["${aws_security_group.sg.id}"]
   user_data       = "${data.template_file.user_data_nginx.rendered}"
 
@@ -47,6 +76,8 @@ resource "aws_launch_configuration" "lc" {
 resource "aws_security_group" "sg" {
   name        = "${var.identifier}-web-sg"
   description = "Http and optionally SSH traffic."
+
+  vpc_id = "${module.vpc_base.vpc_id}"
 
   # SSH access.
   ingress {
@@ -64,6 +95,14 @@ resource "aws_security_group" "sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Database access.
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Outbound internet access.
   egress {
     from_port   = 0
@@ -74,7 +113,7 @@ resource "aws_security_group" "sg" {
 
   tags {
     "Name" = "${var.identifier}-web-sg"
-    "Application ID" = "${var.application_id}"
+    "application" = "${var.application_id}"
   }
 
 }
@@ -112,6 +151,7 @@ resource "aws_autoscaling_group" "asg" {
   force_delete         = true
   launch_configuration = "${aws_launch_configuration.lc.name}"
   load_balancers       = ["${aws_elb.elb.name}"]
+  vpc_zone_identifier  = ["${module.vpc_az.dmz_ids}"]
 
   tag {
     key                 = "Name"
@@ -120,7 +160,7 @@ resource "aws_autoscaling_group" "asg" {
   }
 
   tag {
-    key                 = "Application ID"
+    key                 = "application"
     value               = "${var.application_id}"
     propagate_at_launch = "true"
   }
@@ -133,8 +173,8 @@ resource "aws_elb" "elb" {
   name = "${var.identifier}-web-elb"
 
   # The same availability zone as our instances
-  availability_zones = ["${split(",", var.aws_az)}"]
   security_groups      = ["${aws_security_group.sg.id}"]
+  subnets              = ["${module.vpc_az.dmz_ids}"]
 
   listener {
     instance_port     = 80
@@ -153,7 +193,29 @@ resource "aws_elb" "elb" {
 
   tags {
     "Name" = "${var.identifier}-web-elb"
-    "Application ID" = "${var.application_id}"
+    "application" = "${var.application_id}"
   }
+}
 
+
+# RDS.
+
+resource "aws_db_instance" "rds" {
+  depends_on             = ["aws_security_group.sg"]
+  identifier             = "${var.identifier}-rds"
+  allocated_storage      = "5"
+  engine                 = "mysql"
+  instance_class         = "db.t2.micro"
+  name                   = "drupal"
+  username               = "drupal"
+  password               = "${var.db_pass}"
+  vpc_security_group_ids = ["${aws_security_group.sg.id}"]
+  db_subnet_group_name   = "${aws_db_subnet_group.db_sng.id}"
+  skip_final_snapshot    = true
+  final_snapshot_identifier = "testing"
+}
+
+resource "aws_db_subnet_group" "db_sng" {
+  name        = "main_subnet_group"
+  subnet_ids  = ["${module.vpc_az.dmz_ids}"]
 }

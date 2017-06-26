@@ -1,12 +1,6 @@
 # Tests
 
-No changes can be merged to master without passing the integration tests. What the tests don't cover yet:
-
-* Turning SSH access on->off->on
-* Counting instances in the load balancer
-* Changing instances in the load balancer
-* Anything to do with health checks and how long it takes to replace sick instances.
-* Database stuff (which is a todo feature anyway)
+No changes should be merged to master without passing the integration tests.
 
 # Setting up
 

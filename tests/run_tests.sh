@@ -2,15 +2,17 @@
 
 if [ -f "terraform.tfstate" ]; then
    echo "Aborting tests. Detected existing terraform state, please run 'terraform destroy' and then remove the terraform.* files."
-   exit
+  # exit
 fi
 
+CHECKOUT=$(git symbolic-ref --short -q HEAD)
+
 # Deploy to AWS.
-terraform apply -var-file ./tests/spec/test.tfvar
+terraform apply -var-file ./tests/spec/test.tfvar -var app_checkout="$CHECKOUT"
 
 echo "Wait 2 minutes to allow an ASG instance to come up."
 sleep 120
-terraform apply -var-file ./tests/spec/test.tfvar
+terraform apply -var-file ./tests/spec/test.tfvar -var app_checkout="$CHECKOUT"
 
 # Ensure correct permission of private key.
 chmod 600 tests/spec/insecure_key
@@ -22,3 +24,4 @@ cd ..
 
 # Clean up.
 terraform destroy -force && rm terraform.*
+

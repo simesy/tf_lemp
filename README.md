@@ -58,10 +58,10 @@ module "mymodule" {
     # Used as the AWS "Application ID"
     application_id    = "Web-R-Us Apps"
 
-    # A repo and (within that repo) an Ansible playbook path.
-    # Path to the playbook file in the `app_repo` repository.
+    # A repo, branch, and (within that repo) an Ansible playbook path.
     app_repo          = "https://github.com/simesy/tf_lemp"
-    app_playbook      = "nginx/playbook.yml"
+    app_playbook      = "webserver/playbook.yml"
+    app_checkout      = "master"
     
     # A public key (eg the contents of `cat ~/.ssh/id_rsa.pub`.
     # This will be deployed into the nginx servers.
@@ -70,6 +70,9 @@ module "mymodule" {
     # Whether to allow remote (SSH) access to the nginx servers.
     # (Note currently working)
     remote_access     = "true"
+
+    # Defaults to 'insecurepass'
+    db_pass           = "somethingelse"
     
     # Other defaults.
     # aws_region   = "ap-southeast-2"
@@ -82,17 +85,19 @@ module "mymodule" {
 }
 ```
 
-## Useful links:
+## Summary of resources
 
-On a new AWS account, on the [EC2 overview](https://ap-southeast-2.console.aws.amazon.com/ec2/v2/home?region=ap-southeast-2#)
-page, you should see: 
-* 1x Running Instance (nginx)
+On a *new* AWS account you should see: 
+* 1x Security Groups (in addition the default)
+* 1x Virtual Private Network (in addition to the default)
+* 1x Auto Scaling Group
+* 1x Launch Configuration
+* 1x Running Instance in the ASG
 * 1x Volume
 * 1x Load Balancer
 * 1x Key pair
-* 2x Security Groups (1 was already there)
-
-There will also be 1x [Launch configuration](https://ap-southeast-2.console.aws.amazon.com/ec2/autoscaling/home?region=ap-southeast-2#LaunchConfigurations:) and 1x [Autoscaling group](https://ap-southeast-2.console.aws.amazon.com/ec2/autoscaling/home?region=ap-southeast-2#AutoScalingGroups:view=details).
+* 1x RDS instance (MySQL)
+* 3x Subnets (1 per availability zone)
 
 To track all the resources, you can create a [Resource Group](https://resources.console.aws.amazon.com/r/group) - use the Application ID you set in the main.tf as a filter. 
 

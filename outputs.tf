@@ -2,6 +2,10 @@ output "identifier" {
   value = "${var.identifier}"
 }
 
+output user_data_nginx {
+  value = "${data.template_file.user_data_nginx.rendered}"
+}
+
 
 # SECURITY GROUP
 
@@ -73,6 +77,11 @@ output "elb.instances.first" {
   value = "${aws_elb.elb.instances[0]}"
 }
 
+# Output something like this, or script it.
+# Get the public addess with AWS CLI.
+# aws ec2 describe-instances --instance-ids INSTANCE --query 'Reservations[].Instances[].PublicDnsName' --output text
+# ssh -i ./tests/spec/insecure_key admin@OUTPUT-OF-ABOVE
+
 output "elb.instances.count" {
   value = "${length(aws_elb.elb.instances)}"
 }
@@ -85,3 +94,47 @@ output "elb.source_security_group_id" {
   value = "${aws_elb.elb.source_security_group_id}"
 }
 
+
+# VPC
+
+output vpc.id {
+  value = "${module.vpc_base.vpc_id}"
+}
+
+
+# Route table.
+output rt.route_table_id {
+  value = "${module.vpc_base.rt_dmz_id}"
+}
+
+
+# Internet gateway.
+output igw.id {
+  value = "${module.vpc_base.igw_id}"
+}
+
+
+# RDS
+
+output rds.endpoint {
+  value = "${aws_db_instance.rds.endpoint}"
+}
+
+output rds.address {
+  value = "${aws_db_instance.rds.address}"
+}
+
+output rds.id {
+  value = "${aws_db_instance.rds.id}"
+}
+
+output rds.name {
+  value = "${aws_db_instance.rds.name}"
+}
+
+
+# Database subnet group.
+
+output db_sng.id {
+  value = "${aws_db_subnet_group.db_sng.id}"
+}
