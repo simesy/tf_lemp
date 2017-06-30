@@ -38,6 +38,10 @@ variable "aws_az" {
   default     = "ap-southeast-2a,ap-southeast-2b,ap-southeast-2c"
 }
 
+variable "user_data" {
+  description = "The user_data script that will run on new load balanced instances."
+  default     = "tests/webserver/user_data.tpl"
+}
 
 # @todo Replace AMI with pre-baked or vanilla Ubuntu. Currently uses https://aws.amazon.com/marketplace/pp/B01N0MCONW
 # Hence references to "jet".

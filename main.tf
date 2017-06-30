@@ -41,7 +41,7 @@ resource "aws_route" "r" {
 # Used in aws_launch_configuration.
 data "template_file" "user_data_nginx" {
   depends_on   = ["aws_db_instance.rds"]
-  template =  "${file("${path.module}/tests/webserver/user_data.tpl")}"
+  template =  "${file("${var.user_data}")}"
   vars {
     app_repo = "${var.app_repo}"
     app_checkout = "${var.app_checkout}"
@@ -216,6 +216,6 @@ resource "aws_db_instance" "rds" {
 }
 
 resource "aws_db_subnet_group" "db_sng" {
-  name        = "main_subnet_group"
+  name        = "${var.identifier}-db-sng"
   subnet_ids  = ["${module.vpc_az.dmz_ids}"]
 }
