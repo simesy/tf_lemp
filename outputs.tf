@@ -107,10 +107,29 @@ output rt.route_table_id {
   value = "${module.vpc_base.rt_dmz_id}"
 }
 
+# Subnet IDs.
+output vpc_az.dmz_ids {
+  value = "${module.vpc_az.dmz_ids}"
+}
 
 # Internet gateway.
 output igw.id {
   value = "${module.vpc_base.igw_id}"
+}
+
+
+# EFS
+
+output efs_mnt.id {
+  value = "${aws_efs_mount_target.efs_mnt.id}"
+}
+
+output efs_mnt.dns_name {
+  value = "${aws_efs_mount_target.efs_mnt.dns_name}"
+}
+
+output efs_mnt.network_interface_id  {
+  value = "${aws_efs_mount_target.efs_mnt.network_interface_id}"
 }
 
 

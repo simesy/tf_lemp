@@ -5,6 +5,9 @@ sudo apt-get update -y
 sudo apt-get install git -y
 sudo apt-get install ansible -y
 
+# EFS Dependency
+sudo apt-get install nfs-common
+
 # Run ansible pull.
 sudo bash -c 'echo localhost > /etc/ansible/hosts'
 sudo ansible-pull --url=${ app_repo } \

@@ -73,6 +73,7 @@ resource "aws_launch_configuration" "lc" {
 }
 
 # The security group allows HTTP in and everything out.
+# Note: these should be separate security groups for each service.
 resource "aws_security_group" "sg" {
   name        = "${var.identifier}-web-sg"
   description = "Http and optionally SSH traffic."
@@ -99,6 +100,14 @@ resource "aws_security_group" "sg" {
   ingress {
     from_port   = 3306
     to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # NFS test
+  ingress {
+    from_port   = 0
+    to_port     = 0
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -137,9 +146,29 @@ resource "aws_security_group" "sg" {
 #}
 
 #
-# Autoscaling Group and Load Balancer.
+# File system for Drupal files.
 #
 
+resource "aws_efs_file_system" "efs" {
+  creation_token = "${var.identifier}-efs"
+
+  tags {
+    "Name" = "${var.identifier}-efs"
+    "application" = "${var.application_id}"
+  }
+}
+
+resource "aws_efs_mount_target" "efs_mnt" {
+  count = "${length(module.vpc_az.dmz_ids)}"
+
+  file_system_id = "${aws_efs_file_system.efs.id}"
+  subnet_id      = "${element(module.vpc_az.dmz_ids, count.index)}"
+  security_groups      = ["${aws_security_group.sg.id}"]
+}
+
+#
+# Autoscaling Group and Load Balancer.
+#
 
 # AWS Autoscaling group
 resource "aws_autoscaling_group" "asg" {
